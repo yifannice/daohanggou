@@ -3,9 +3,15 @@
   "version": "1.0.0",
   "description": "工具导航网站",
   "scripts": {
-    "build": "tailwindcss -i ./src/input.css -o ./dist/output.css --minify && node build.js"
+    "dev": "tailwindcss -i ./src/input.css -o ./dist/output.css --watch",
+    "build": "tailwindcss -i ./src/input.css -o ./dist/output.css --minify && node build.js",
+    "start": "serve ."
   },
   "devDependencies": {
+    "serve": "^14.2.1",
     "tailwindcss": "^3.4.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
-} 
+}

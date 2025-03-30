@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 // 读取HTML文件
-const htmlPath = path.join(__dirname, 'daohang.html');
+const htmlPath = path.join(__dirname, 'index.html');
 let html = fs.readFileSync(htmlPath, 'utf8');
 
 // 替换CSS引用

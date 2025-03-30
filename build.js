@@ -15,11 +15,10 @@ fs.copyFileSync(htmlSource, htmlDest);
 // 读取并处理 index.html
 let html = fs.readFileSync(htmlDest, 'utf8');
 
-// 替换CSS引用路径
-html = html.replace(
-    '<!-- <link href="/dist/output.css" rel="stylesheet"> -->',
-    '<link href="/output.css" rel="stylesheet">'
-);
+// 确保 CSS 引用路径正确
+if (!html.includes('href="/output.css"')) {
+    html = html.replace('</head>', '<link href="/output.css" rel="stylesheet">\n</head>');
+}
 
 // 写入处理后的 HTML 文件
 fs.writeFileSync(htmlDest, html);

@@ -1,0 +1,11 @@
+{
+  "name": "toolbox",
+  "version": "1.0.0",
+  "description": "工具导航网站",
+  "scripts": {
+    "build": "tailwindcss -i ./src/input.css -o ./dist/output.css --minify && node build.js"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.1"
+  }
+} 

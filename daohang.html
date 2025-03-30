@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>导航狗 - 实用工具导航网站</title>
+    <meta name="description" content="导航狗是一个专业的工具导航网站,收录了AI工具、素材库、壁纸、常用工具等多种实用工具,让您轻松找到所需工具！">
+    <link rel="canonical" href="https://daohanggou.online" />
+    <!-- 开发环境使用CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 生产环境使用构建后的CSS -->
+    <!-- <link href="/dist/output.css" rel="stylesheet"> -->
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'apple-blue': '#007AFF',
+                        'apple-gray': '#1D1D1F',
+                        'apple-light-gray': '#86868B',
+                        'apple-bg': '#F5F5F7'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style type="text/tailwindcss">
+        @layer components {
+            .nav-item {
+                @apply px-4 py-2 text-white hover:text-apple-blue transition-colors duration-200;
+            }
+            .tool-card {
+                @apply bg-white rounded-lg p-4 shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100;
+            }
+            .mobile-menu {
+                @apply fixed inset-0 bg-white z-50 transform transition-transform duration-300;
+            }
+            .mobile-menu.hidden {
+                @apply translate-x-full;
+            }
+            .header-bg {
+                background: linear-gradient(135deg, #0a0c1b 0%, #1a1f3c 50%, #2a1f3c 100%);
+                background-image: 
+                    linear-gradient(135deg, #0a0c1b 0%, #1a1f3c 50%, #2a1f3c 100%),
+                    url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%234a90e2' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+                position: relative;
+                overflow: hidden;
+            }
+            .header-bg::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: radial-gradient(circle at 50% 50%, rgba(155, 81, 255, 0.1) 0%, transparent 50%);
+                pointer-events: none;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-white min-h-screen text-apple-gray">
+    <!-- 顶部导航 -->
+    <header class="header-bg shadow-lg">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-center items-center py-8">
+                <h1 class="text-4xl font-bold text-white mx-8 tracking-[0.2em]">导航狗</h1>
+                <!-- 移动端菜单按钮 -->
+                <button class="md:hidden absolute right-4" id="menuButton">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- 搜索框 -->
+            <div class="max-w-3xl mx-auto py-4">
+                <div class="relative">
+                    <input type="text"
+                        id="searchInput"
+                        class="w-full px-4 py-2 bg-gray-800 rounded-lg text-white placeholder-gray-400 outline-none focus:ring-2 focus:ring-apple-blue border border-gray-700"
+                        placeholder="搜索工具...">
+                    <button class="absolute right-2 top-1/2 transform -translate-y-1/2">
+                        <svg class="w-6 h-6 text-apple-light-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 主导航菜单 -->
+            <nav class="hidden md:flex justify-center space-x-4 py-4">
+                <a href="#ai-tools" class="nav-item">AI工具</a>
+                <a href="#ai-drawing" class="nav-item">AI绘图</a>
+                <a href="#resources" class="nav-item">素材库</a>
+                <a href="#wallpapers" class="nav-item">壁纸</a>
+                <a href="#common-tools" class="nav-item">常用工具</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- 移动端菜单 -->
+    <div class="mobile-menu hidden" id="mobileMenu">
+        <div class="p-4">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold">菜单</h2>
+                <button id="closeMenu">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <nav class="flex flex-col space-y-2">
+                <a href="#ai-tools" class="nav-item">AI工具</a>
+                <a href="#ai-drawing" class="nav-item">AI绘图</a>
+                <a href="#resources" class="nav-item">素材库</a>
+                <a href="#wallpapers" class="nav-item">壁纸</a>
+                <a href="#common-tools" class="nav-item">常用工具</a>
+            </nav>
+        </div>
+    </div>
+
+    <!-- 主要内容区 -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- AI工具分类 -->
+        <section id="ai-tools" class="mb-12">
+            <h2 class="text-2xl font-bold mb-6 flex items-center">
+                <svg class="w-8 h-8 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" fill="currentColor"/>
+                    <path d="M12 6c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z" fill="currentColor"/>
+                </svg>
+                AI工具
+            </h2>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <!-- DeepSeek -->
+                <a href="https://deepseek.com" target="_blank" rel="noopener noreferrer" class="tool-card">
+                    <div class="flex items-center mb-3">
+                        <img src="https://deepseek.com/favicon.ico" alt="DeepSeek" class="w-8 h-8 rounded-lg mr-3">
+                        <h3 class="font-medium">DeepSeek</h3>
+                    </div>
+                    <p class="text-sm text-apple-light-gray">爆火的国产深度思考AI</p>
+                </a>
+
+                <!-- 通义千问 -->
+                <a href="https://tongyi.aliyun.com" target="_blank" rel="noopener noreferrer" class="tool-card">
+                    <div class="flex items-center mb-3">
+                        <img src="https://www.google.com/s2/favicons?domain=tongyi.aliyun.com&sz=64" alt="通义千问" class="w-8 h-8 rounded-lg mr-3">
+                        <h3 class="font-medium">通义千问</h3>
+                    </div>
+                    <p class="text-sm text-apple-light-gray">阿里旗下AI助手</p>
+                </a>
+
+                <!-- 豆包 -->
+                <a href="https://www.doubao.com" target="_blank" rel="noopener noreferrer" class="tool-card">
+                    <div class="flex items-center mb-3">
+                        <img src="https://www.google.com/s2/favicons?domain=www.doubao.com&sz=64" alt="豆包" class="w-8 h-8 rounded-lg mr-3">
+                        <h3 class="font-medium">豆包</h3>
+                    </div>
+                    <p class="text-sm text-apple-light-gray">字节跳动AI助手</p>
+                </a>
+
+                <!-- Kimi -->
+                <a href="https://kimi.moonshot.cn" target="_blank" rel="noopener noreferrer" class="tool-card">
+                    <div class="flex items-center mb-3">
+                        <img src="https://www.google.com/s2/favicons?domain=kimi.moonshot.cn&sz=64" alt="Kimi" class="w-8 h-8 rounded-lg mr-3">
+                        <h3 class="font-medium">Kimi</h3>
+                    </div>
+                    <p class="text-sm text-apple-light-gray">月之暗面AI助手</p>
+                </a>
+
+                <!-- 秘塔 -->
+                <a href="https://metaso.cn" target="_blank" rel="noopener noreferrer" class="tool-card">
+                    <div class="flex items-center mb-3">
+                        <img src="https://metaso.cn/favicon.ico" alt="秘塔" class="w-8 h-8 rounded-lg mr-3">
+                        <h3 class="font-medium">秘塔</h3>
+                    </div>
+                    <p class="text-sm text-apple-light-gray">AI搜索助手</p>
+                </a>
+
+                <!-- Claude -->
+                <a href="https://claude.ai" target="_blank" rel="noopener noreferrer" class="tool-card">
+                    <div class="flex items-center mb-3">
+                        <img src="https://claude.ai/favicon.ico" alt="Claude" class="w-8 h-8 rounded-lg mr-3">
+                        <h3 class="font-medium">Claude</h3>
+                    </div>
+                    <p class="text-sm text-apple-light-gray">Anthropic AI助手</p>
+                </a>
+
+                <!-- OpenAI -->
+                <a href="https://openai.com" target="_blank" rel="noopener noreferrer" class="tool-card">
+                    <div class="flex items-center mb-3">
+                        <img src="https://openai.com/favicon.ico" alt="OpenAI" class="w-8 h-8 rounded-lg mr-3">
+                        <h3 class="font-medium">OpenAI</h3>
+                    </div>
+                    <p class="text-sm text-apple-light-gray">OpenAI官网</p>
+                </a>
+
+                <!-- Cursor -->
+                <a href="https://cursor.sh" target="_blank" rel="noopener noreferrer" class="tool-card">
+                    <div class="flex items-center mb-3">
+                        <img src="https://cursor.sh/favicon.ico" alt="Cursor" class="w-8 h-8 rounded-lg mr-3">
+                        <h3 class="font-medium">Cursor</h3>
+                    </div>
+                    <p class="text-sm text-apple-light-gray">AI编程助手</p>
+                </a>
+
+                <!-- ChatGPT -->
+                <a href="https://chat.openai.com" target="_blank" rel="noopener noreferrer" class="tool-card">
+                    <div class="flex items-center mb-3">
+                        <img src="https://chat.openai.com/favicon.ico" alt="ChatGPT" class="w-8 h-8 rounded-lg mr-3">
+                        <h3 class="font-medium">ChatGPT</h3>
+                    </div>
+                    <p class="text-sm text-apple-light-gray">OpenAI聊天机器人</p>
+                </a>
+            </div>
+        </section>
+
+        <!-- AI绘图工具 -->
+        <section id="ai-drawing" class="mb-12">
+            <h2 class="text-2xl font-bold mb-6 flex items-center">
+                <svg class="w-8 h-8 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z" fill="currentColor"/>
+                </svg>
+                AI绘图工具
+            </h2>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <!-- 即梦AI -->
+                <a href="https://jimeng.jianying.com/ai-tool/home" target="_blank" rel="noopener noreferrer" class="tool-card">
+                    <div class="flex items-center mb-3">
+                        <img src="https://www.google.com/s2/favicons?domain=jimeng.jianying.com&sz=64" alt="即梦AI" class="w-8 h-8 rounded-lg mr-3">
+                        <h3 class="font-medium">即梦AI</h3>
+                    </div>
+                    <p class="text-sm text-apple-light-gray">抖音旗下AI绘画</p>
+                </a>
+
+                <!-- 绘蛙 -->
+                <a href="https://www.ihuiwa.com/" target="_blank" rel="noopener noreferrer" class="tool-card">
+                    <div class="flex items-center mb-3">
+                        <img src="https://www.google.com/s2/favicons?domain=www.ihuiwa.com&sz=64" alt="绘蛙" class="w-8 h-8 rounded-lg mr-3">
+                        <h3 class="font-medium">绘蛙</h3>
+                    </div>
+                    <p class="text-sm text-apple-light-gray">阿里AI绘画工具</p>
+                </a>
+
+                <!-- WHEE -->
+                <a href="https://www.whee.com/" target="_blank" rel="noopener noreferrer" class="tool-card">
+                    <div class="flex items-center mb-3">
+                        <img src="https://www.google.com/s2/favicons?domain=www.whee.com&sz=64" alt="WHEE" class="w-8 h-8 rounded-lg mr-3">
+                        <h3 class="font-medium">WHEE</h3>
+                    </div>
+                    <p class="text-sm text-apple-light-gray">美图AI绘画</p>
+                </a>
+
+                <!-- 稿定AI -->
+                <a href="https://www.gaoding.com/ai" target="_blank" rel="noopener noreferrer" class="tool-card">
+                    <div class="flex items-center mb-3">
+                        <img src="https://www.google.com/s2/favicons?domain=www.gaoding.com&sz=64" alt="稿定AI" class="w-8 h-8 rounded-lg mr-3">
+                        <h3 class="font-medium">稿定AI</h3>
+                    </div>
+                    <p class="text-sm text-apple-light-gray">AI设计工具</p>
+                </a>
+
+                <!-- 可灵AI生图 -->
+                <a href="https://app.klingai.com/cn/" target="_blank" rel="noopener noreferrer" class="tool-card">
+                    <div class="flex items-center mb-3">
+                        <img src="https://app.klingai.com/favicon.ico" alt="可灵AI" class="w-8 h-8 rounded-lg mr-3">
+                        <h3 class="font-medium">可灵AI生图</h3>
+                    </div>
+                    <p class="text-sm text-apple-light-gray">AI图像生成</p>
+                </a>
+
+                <!-- Midjourney -->
+                <a href="https://www.midjourney.com" target="_blank" rel="noopener noreferrer" class="tool-card">
+                    <div class="flex items-center mb-3">
+                        <img src="https://www.google.com/s2/favicons?domain=www.midjourney.com&sz=64" alt="Midjourney" class="w-8 h-8 rounded-lg mr-3">
+                        <h3 class="font-medium">Midjourney</h3>
+                    </div>
+                    <p class="text-sm text-apple-light-gray">顶级AI绘画工具</p>
+                </a>
+
+                <!-- Stable Diffusion -->
+                <a href="https://stability.ai" target="_blank" rel="noopener noreferrer" class="tool-card">
+                    <div class="flex items-center mb-3">
+                        <img src="https://stability.ai/favicon.ico" alt="Stable Diffusion" class="w-8 h-8 rounded-lg mr-3">
+                        <h3 class="font-medium">Stable Diffusion</h3>
+                    </div>
+                    <p class="text-sm text-apple-light-gray">开源AI绘画模型</p>
+                </a>
+            </div>
+        </section>
+
+        <!-- 素材库 -->
+        <section id="resources" class="mb-12">
+            <h2 class="text-2xl font-bold mb-6 flex items-center">
+                <svg class="w-8 h-8 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z" fill="currentColor"/>
+                    <path d="M7 12h2v5H7zm4-7h2v12h-2zm4 3h2v9h-2z" fill="currentColor"/>
+                </svg>
+                素材库
+            </h2>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <!-- Pexels -->
+                <a href="https://www.pexels.com" target="_blank" rel="noopener noreferrer" class="tool-card">
+                    <div class="flex items-center mb-3">
+                        <img src="https://www.pexels.com/favicon.ico" alt="Pexels" class="w-8 h-8 rounded-lg mr-3">
+                        <h3 class="font-medium">Pexels</h3>
+                    </div>
+                    <p class="text-sm text-apple-light-gray">免费图片素材库</p>
+                </a>
+
+                <!-- Pixabay -->
+                <a href="https://pixabay.com" target="_blank" rel="noopener noreferrer" class="tool-card">
+                    <div class="flex items-center mb-3">
+                        <img src="https://pixabay.com/favicon.ico" alt="Pixabay" class="w-8 h-8 rounded-lg mr-3">
+                        <h3 class="font-medium">Pixabay</h3>
+                    </div>
+                    <p class="text-sm text-apple-light-gray">免费图片和视频素材</p>
+                </a>
+
+                <!-- Unsplash -->
+                <a href="https://unsplash.com" target="_blank" rel="noopener noreferrer" class="tool-card">
+                    <div class="flex items-center mb-3">
+                        <img src="https://unsplash.com/favicon.ico" alt="Unsplash" class="w-8 h-8 rounded-lg mr-3">
+                        <h3 class="font-medium">Unsplash</h3>
+                    </div>
+                    <p class="text-sm text-apple-light-gray">高质量免费图片</p>
+                </a>
+
+                <!-- 站酷 -->
+                <a href="https://www.zcool.com.cn" target="_blank" rel="noopener noreferrer" class="tool-card">
+                    <div class="flex items-center mb-3">
+                        <img src="https://www.google.com/s2/favicons?domain=www.zcool.com.cn&sz=64" alt="站酷" class="w-8 h-8 rounded-lg mr-3">
+                        <h3 class="font-medium">站酷</h3>
+                    </div>
+                    <p class="text-sm text-apple-light-gray">设计师社区</p>
+                </a>
+
+                <!-- 花瓣网 -->
+                <a href="https://huaban.com" target="_blank" rel="noopener noreferrer" class="tool-card">
+                    <div class="flex items-center mb-3">
+                        <img src="https://huaban.com/favicon.ico" alt="花瓣网" class="w-8 h-8 rounded-lg mr-3">
+                        <h3 class="font-medium">花瓣网</h3>
+                    </div>
+                    <p class="text-sm text-apple-light-gray">图片素材分享</p>
+                </a>
+
+                <!-- Behance -->
+                <a href="https://www.behance.net" target="_blank" rel="noopener noreferrer" class="tool-card">
+                    <div class="flex items-center mb-3">
+                        <img src="https://www.google.com/s2/favicons?domain=www.behance.net" alt="Behance" class="w-8 h-8 rounded-lg mr-3">
+                        <h3 class="font-medium">Behance</h3>
+                    </div>
+                    <p class="text-sm text-apple-light-gray">创意设计展示</p>
+                </a>
+
+                <!-- ByteDance IconPark -->
+                <a href="https://iconpark.oceanengine.com" target="_blank" rel="noopener noreferrer" class="tool-card">
+                    <div class="flex items-center mb-3">
+                        <img src="https://www.google.com/s2/favicons?domain=iconpark.oceanengine.com&sz=64" alt="ByteDance IconPark" class="w-8 h-8 rounded-lg mr-3">
+                        <h3 class="font-medium">ByteDance IconPark</h3>
+                    </div>
+                    <p class="text-sm text-apple-light-gray">字节跳动图标库</p>
+                </a>
+
+                <!-- Flaticon -->
+                <a href="https://www.flaticon.com" target="_blank" rel="noopener noreferrer" class="tool-card">
+                    <div class="flex items-center mb-3">
+                        <img src="https://www.flaticon.com/favicon.ico" alt="Flaticon" class="w-8 h-8 rounded-lg mr-3">
+                        <h3 class="font-medium">Flaticon</h3>
+                    </div>
+                    <p class="text-sm text-apple-light-gray">图标素材库</p>
+                </a>
+
+                <!-- Iconfont -->
+                <a href="https://www.iconfont.cn" target="_blank" rel="noopener noreferrer" class="tool-card">
+                    <div class="flex items-center mb-3">
+                        <img src="https://www.iconfont.cn/favicon.ico" alt="Iconfont" class="w-8 h-8 rounded-lg mr-3">
+                        <h3 class="font-medium">Iconfont</h3>
+                    </div>
+                    <p class="text-sm text-apple-light-gray">阿里巴巴矢量图标库</p>
+                </a>
+
+                <!-- Dribbble -->
+                <a href="https://dribbble.com" target="_blank" rel="noopener noreferrer" class="tool-card">
+                    <div class="flex items-center mb-3">
+                        <img src="https://www.google.com/s2/favicons?domain=dribbble.com" alt="Dribbble" class="w-8 h-8 rounded-lg mr-3">
+                        <h3 class="font-medium">Dribbble</h3>
+                    </div>
+                    <p class="text-sm text-apple-light-gray">设计师作品展示</p>
+                </a>
+            </div>
+        </section>
+
+        <!-- 壁纸 -->
+        <section id="wallpapers" class="mb-12">
+            <h2 class="text-2xl font-bold mb-6 flex items-center">
+                <svg class="w-8 h-8 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z" fill="currentColor"/>
+                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z" fill="currentColor"/>
+                </svg>
+                壁纸
+            </h2>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <!-- Bing壁纸 -->
+                <a href="https://bing.wdbyte.com/zh-cn/" target="_blank" rel="noopener noreferrer" class="tool-card">
+                    <div class="flex items-center mb-3">
+                        <img src="https://www.google.com/s2/favicons?domain=bing.wdbyte.com&sz=64" alt="Bing壁纸" class="w-8 h-8 rounded-lg mr-3">
+                        <h3 class="font-medium">Bing壁纸</h3>
+                    </div>
+                    <p class="text-sm text-apple-light-gray">必应每日壁纸</p>
+                </a>
+
+                <!-- Wallspic -->
+                <a href="https://wallspic.com/cn" target="_blank" rel="noopener noreferrer" class="tool-card">
+                    <div class="flex items-center mb-3">
+                        <img src="https://wallspic.com/favicon.ico" alt="Wallspic" class="w-8 h-8 rounded-lg mr-3">
+                        <h3 class="font-medium">Wallspic</h3>
+                    </div>
+                    <p class="text-sm text-apple-light-gray">高清壁纸下载</p>
+                </a>
+
+                <!-- 哲风壁纸 -->
+                <a href="https://haowallpaper.com/" target="_blank" rel="noopener noreferrer" class="tool-card">
+                    <div class="flex items-center mb-3">
+                        <img src="https://haowallpaper.com/favicon.ico" alt="哲风壁纸" class="w-8 h-8 rounded-lg mr-3">
+                        <h3 class="font-medium">哲风壁纸</h3>
+                    </div>
+                    <p class="text-sm text-apple-light-gray">精选壁纸网站</p>
+                </a>
+
+                <!-- Wallpaper Abyss -->
+                <a href="https://wall.alphacoders.com" target="_blank" rel="noopener noreferrer" class="tool-card">
+                    <div class="flex items-center mb-3">
+                        <img src="https://www.google.com/s2/favicons?domain=wall.alphacoders.com" alt="Wallpaper Abyss" class="w-8 h-8 rounded-lg mr-3">
+                        <h3 class="font-medium">Wallpaper Abyss</h3>
+                    </div>
+                    <p class="text-sm text-apple-light-gray">高清壁纸资源</p>
+                </a>
+
+                <!-- WallpaperCave -->
+                <a href="https://wallpapercave.com" target="_blank" rel="noopener noreferrer" class="tool-card">
+                    <div class="flex items-center mb-3">
+                        <img src="https://wallpapercave.com/favicon.ico" alt="WallpaperCave" class="w-8 h-8 rounded-lg mr-3">
+                        <h3 class="font-medium">WallpaperCave</h3>
+                    </div>
+                    <p class="text-sm text-apple-light-gray">壁纸分享社区</p>
+                </a>
+
+                <!-- 4K Wallpaper -->
+                <a href="https://4kwallpapers.com" target="_blank" rel="noopener noreferrer" class="tool-card">
+                    <div class="flex items-center mb-3">
+                        <img src="https://4kwallpapers.com/favicon.ico" alt="4K Wallpaper" class="w-8 h-8 rounded-lg mr-3">
+                        <h3 class="font-medium">4K Wallpaper</h3>
+                    </div>
+                    <p class="text-sm text-apple-light-gray">4K超清壁纸</p>
+                </a>
+
+                <!-- Wallpaper Flare -->
+                <a href="https://www.wallpaperflare.com" target="_blank" rel="noopener noreferrer" class="tool-card">
+                    <div class="flex items-center mb-3">
+                        <img src="https://www.google.com/s2/favicons?domain=www.wallpaperflare.com" alt="Wallpaper Flare" class="w-8 h-8 rounded-lg mr-3">
+                        <h3 class="font-medium">Wallpaper Flare</h3>
+                    </div>
+                    <p class="text-sm text-apple-light-gray">免费壁纸下载</p>
+                </a>
+            </div>
+        </section>
+
+        <!-- 常用工具 -->
+        <section id="common-tools" class="mb-12">
+            <h2 class="text-2xl font-bold mb-6 flex items-center">
+                <svg class="w-8 h-8 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z" fill="currentColor"/>
+                </svg>
+                常用工具
+            </h2>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <!-- 在线PDF工具 -->
+                <a href="https://www.ilovepdf.com" target="_blank" rel="noopener noreferrer" class="tool-card">
+                    <div class="flex items-center mb-3">
+                        <img src="https://www.ilovepdf.com/favicon.ico" alt="在线PDF工具" class="w-8 h-8 rounded-lg mr-3">
+                        <h3 class="font-medium">在线PDF工具</h3>
+                    </div>
+                    <p class="text-sm text-apple-light-gray">PDF在线处理工具</p>
+                </a>
+
+                <!-- 在线图片编辑 -->
+                <a href="https://www.canva.com" target="_blank" rel="noopener noreferrer" class="tool-card">
+                    <div class="flex items-center mb-3">
+                        <img src="https://www.canva.com/favicon.ico" alt="在线图片编辑" class="w-8 h-8 rounded-lg mr-3">
+                        <h3 class="font-medium">在线图片编辑</h3>
+                    </div>
+                    <p class="text-sm text-apple-light-gray">Canva在线设计</p>
+                </a>
+
+                <!-- 在线视频编辑 -->
+                <a href="https://www.capcut.cn" target="_blank" rel="noopener noreferrer" class="tool-card">
+                    <div class="flex items-center mb-3">
+                        <img src="https://www.google.com/s2/favicons?domain=www.capcut.cn" alt="在线视频编辑" class="w-8 h-8 rounded-lg mr-3">
+                        <h3 class="font-medium">在线视频编辑</h3>
+                    </div>
+                    <p class="text-sm text-apple-light-gray">剪映在线版</p>
+                </a>
+
+                <!-- 在线格式转换 -->
+                <a href="https://cloudconvert.com" target="_blank" rel="noopener noreferrer" class="tool-card">
+                    <div class="flex items-center mb-3">
+                        <img src="https://www.google.com/s2/favicons?domain=cloudconvert.com" alt="在线格式转换" class="w-8 h-8 rounded-lg mr-3">
+                        <h3 class="font-medium">在线格式转换</h3>
+                    </div>
+                    <p class="text-sm text-apple-light-gray">文件格式转换</p>
+                </a>
+
+                <!-- 在线翻译 -->
+                <a href="https://fanyi.baidu.com" target="_blank" rel="noopener noreferrer" class="tool-card">
+                    <div class="flex items-center mb-3">
+                        <img src="https://fanyi.baidu.com/favicon.ico" alt="在线翻译" class="w-8 h-8 rounded-lg mr-3">
+                        <h3 class="font-medium">在线翻译</h3>
+                    </div>
+                    <p class="text-sm text-apple-light-gray">百度翻译</p>
+                </a>
+
+                <!-- 在线截图 -->
+                <a href="https://snipaste.com" target="_blank" rel="noopener noreferrer" class="tool-card">
+                    <div class="flex items-center mb-3">
+                        <img src="https://snipaste.com/favicon.ico" alt="在线截图" class="w-8 h-8 rounded-lg mr-3">
+                        <h3 class="font-medium">在线截图</h3>
+                    </div>
+                    <p class="text-sm text-apple-light-gray">截图工具</p>
+                </a>
+
+                <!-- 在线录屏 -->
+                <a href="https://www.screencast-o-matic.com" target="_blank" rel="noopener noreferrer" class="tool-card">
+                    <div class="flex items-center mb-3">
+                        <img src="https://www.screencast-o-matic.com/favicon.ico" alt="在线录屏" class="w-8 h-8 rounded-lg mr-3">
+                        <h3 class="font-medium">在线录屏</h3>
+                    </div>
+                    <p class="text-sm text-apple-light-gray">屏幕录制工具</p>
+                </a>
+
+                <!-- 在线思维导图 -->
+                <a href="https://www.mindmaster.io" target="_blank" rel="noopener noreferrer" class="tool-card">
+                    <div class="flex items-center mb-3">
+                        <img src="https://www.google.com/s2/favicons?domain=www.mindmaster.io" alt="在线思维导图" class="w-8 h-8 rounded-lg mr-3">
+                        <h3 class="font-medium">在线思维导图</h3>
+                    </div>
+                    <p class="text-sm text-apple-light-gray">思维导图工具</p>
+                </a>
+
+                <!-- 在线文档协作 -->
+                <a href="https://docs.qq.com" target="_blank" rel="noopener noreferrer" class="tool-card">
+                    <div class="flex items-center mb-3">
+                        <img src="https://www.google.com/s2/favicons?domain=docs.qq.com" alt="在线文档协作" class="w-8 h-8 rounded-lg mr-3">
+                        <h3 class="font-medium">在线文档协作</h3>
+                    </div>
+                    <p class="text-sm text-apple-light-gray">腾讯文档</p>
+                </a>
+
+                <!-- 在线会议 -->
+                <a href="https://meeting.qq.com" target="_blank" rel="noopener noreferrer" class="tool-card">
+                    <div class="flex items-center mb-3">
+                        <img src="https://meeting.qq.com/favicon.ico" alt="在线会议" class="w-8 h-8 rounded-lg mr-3">
+                        <h3 class="font-medium">在线会议</h3>
+                    </div>
+                    <p class="text-sm text-apple-light-gray">腾讯会议</p>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-apple-bg py-8">
+        <div class="container mx-auto px-4 text-center text-apple-light-gray">
+            <p>&copy; 2024 导航狗 - 实用工具导航网站</p>
+        </div>
+    </footer>
+
+    <script>
+        // 等待DOM加载完成
+        document.addEventListener('DOMContentLoaded', function() {
+            // 移动端菜单控制
+            const menuButton = document.getElementById('menuButton');
+            const closeMenu = document.getElementById('closeMenu');
+            const mobileMenu = document.getElementById('mobileMenu');
+
+            menuButton.addEventListener('click', () => {
+                mobileMenu.classList.remove('hidden');
+            });
+
+            closeMenu.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+
+            // 点击菜单项后关闭菜单
+            const menuItems = mobileMenu.querySelectorAll('a');
+            menuItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                });
+            });
+
+            // 搜索功能实现
+            const searchInput = document.getElementById('searchInput');
+            const toolCards = document.querySelectorAll('.tool-card');
+
+            if (!searchInput) {
+                console.error('搜索框元素未找到');
+                return;
+            }
+
+            searchInput.addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase().trim();
+                console.log('搜索关键词:', searchTerm);
+                
+                toolCards.forEach(card => {
+                    const title = card.querySelector('h3').textContent.toLowerCase();
+                    const description = card.querySelector('p').textContent.toLowerCase();
+                    
+                    if (title.includes(searchTerm) || description.includes(searchTerm)) {
+                        card.classList.remove('hidden');
+                    } else {
+                        card.classList.add('hidden');
+                    }
+                });
+
+                // 检查每个分类是否有可见的卡片
+                document.querySelectorAll('section').forEach(section => {
+                    const visibleCards = section.querySelectorAll('.tool-card:not(.hidden)');
+                    if (visibleCards.length === 0) {
+                        section.classList.add('hidden');
+                    } else {
+                        section.classList.remove('hidden');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

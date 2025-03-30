@@ -4,7 +4,11 @@
 
 @layer components {
     .nav-item {
-        @apply px-4 py-2 text-nav-text hover:text-nav-hover transition-colors duration-200 !important;
+        @apply px-4 py-2 text-white hover:text-white transition-colors duration-200 font-medium !important;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.2) !important;
+    }
+    .nav-item:hover {
+        @apply bg-white/10 !important;
     }
     .tool-card {
         @apply bg-white rounded-lg p-4 shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100;

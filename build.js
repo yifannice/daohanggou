@@ -7,6 +7,22 @@ if (!fs.existsSync(distDir)) {
     fs.mkdirSync(distDir, { recursive: true });
 }
 
+// 复制 images 文件夹到构建输出目录
+const imagesDir = path.join(__dirname, 'images');
+const imagesDestDir = path.join(distDir, 'images');
+if (fs.existsSync(imagesDir)) {
+    if (!fs.existsSync(imagesDestDir)) {
+        fs.mkdirSync(imagesDestDir, { recursive: true });
+    }
+    // 复制所有图片文件
+    const files = fs.readdirSync(imagesDir);
+    files.forEach(file => {
+        const sourcePath = path.join(imagesDir, file);
+        const destPath = path.join(imagesDestDir, file);
+        fs.copyFileSync(sourcePath, destPath);
+    });
+}
+
 // 复制 index.html 到构建输出目录
 const htmlSource = path.join(__dirname, 'index.html');
 const htmlDest = path.join(distDir, 'index.html');
